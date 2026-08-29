@@ -1,0 +1,548 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0b5ed7">
+<title>PMR Madya • Belajar Kepalangmerahan</title>
+
+<style>
+:root{
+  --blue:#1677ff;
+  --blue2:#4da3ff;
+  --cyan:#72d9ff;
+  --bg:#06101d;
+  --glass:rgba(255,255,255,.09);
+  --glass2:rgba(255,255,255,.14);
+  --line:rgba(255,255,255,.18);
+  --text:#f4f8ff;
+  --muted:#b7c7dc;
+  --danger:#ff6b7a;
+  --shadow:0 20px 60px rgba(0,0,0,.32);
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+  color:var(--text);
+  background:
+    radial-gradient(circle at 10% 5%,rgba(22,119,255,.28),transparent 28%),
+    radial-gradient(circle at 90% 25%,rgba(0,210,255,.16),transparent 25%),
+    radial-gradient(circle at 45% 100%,rgba(61,91,255,.18),transparent 30%),
+    var(--bg);
+  min-height:100vh;
+  overflow-x:hidden;
+}
+body:before,body:after{
+  content:"";position:fixed;z-index:-1;border-radius:50%;pointer-events:none;
+  filter:blur(80px);opacity:.25;
+}
+body:before{width:260px;height:260px;background:#1685ff;left:-100px;top:35%}
+body:after{width:300px;height:300px;background:#00bfff;right:-120px;bottom:5%}
+
+button,input{font:inherit}
+button{cursor:pointer}
+a{text-decoration:none;color:inherit}
+
+.glass{
+  background:linear-gradient(135deg,rgba(255,255,255,.12),rgba(255,255,255,.045));
+  border:1px solid var(--line);
+  box-shadow:var(--shadow),inset 0 1px rgba(255,255,255,.15);
+  backdrop-filter:blur(22px);
+  -webkit-backdrop-filter:blur(22px);
+}
+
+.nav{
+  position:sticky;top:12px;z-index:50;
+  width:min(1120px,92%);
+  margin:12px auto;
+  padding:12px 14px;
+  border-radius:22px;
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+}
+.brand{display:flex;align-items:center;gap:10px;font-weight:800}
+.logo{
+  width:42px;height:42px;border-radius:14px;display:grid;place-items:center;
+  background:linear-gradient(145deg,#4eb4ff,#0968ed);
+  box-shadow:0 8px 25px rgba(22,119,255,.35);
+  font-size:22px;
+}
+.navlinks{display:flex;gap:7px;flex-wrap:wrap;justify-content:flex-end}
+.navlinks button,.small-btn{
+  border:1px solid rgba(255,255,255,.13);
+  color:#fff;background:rgba(255,255,255,.07);
+  padding:9px 12px;border-radius:13px;
+}
+.navlinks button:hover,.small-btn:hover{background:rgba(255,255,255,.14)}
+
+main{width:min(1120px,92%);margin:auto}
+.hero{
+  margin-top:30px;padding:34px 24px;border-radius:30px;position:relative;overflow:hidden;
+}
+.hero:after{
+  content:"✚";position:absolute;right:-30px;bottom:-65px;font-size:220px;
+  color:rgba(100,190,255,.06);transform:rotate(-18deg)
+}
+.badge{
+  display:inline-flex;gap:7px;align-items:center;
+  padding:7px 11px;border-radius:999px;
+  background:rgba(80,180,255,.12);border:1px solid rgba(120,210,255,.22);
+  color:#a9ddff;font-size:13px;font-weight:700;
+}
+.hero h1{font-size:clamp(34px,8vw,68px);line-height:1.02;margin:18px 0 12px}
+.gradient{background:linear-gradient(90deg,#fff,#8bd7ff,#4c9cff);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p{max-width:760px;color:var(--muted);line-height:1.7}
+.hero-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}
+.primary{
+  border:0;padding:12px 17px;border-radius:15px;color:#fff;font-weight:800;
+  background:linear-gradient(135deg,#0b6fff,#28b5ff);
+  box-shadow:0 10px 30px rgba(0,126,255,.28)
+}
+.secondary{
+  border:1px solid var(--line);padding:12px 17px;border-radius:15px;color:#fff;
+  background:rgba(255,255,255,.07)
+}
+
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:16px 0 28px}
+.stat{padding:18px;border-radius:20px}
+.stat b{display:block;font-size:25px}
+.stat span{color:var(--muted);font-size:13px}
+
+.section{margin:34px 0}
+.section-head{display:flex;justify-content:space-between;gap:15px;align-items:end;margin-bottom:14px}
+.section h2{font-size:25px}
+.section-head p{color:var(--muted);font-size:14px}
+
+.search{
+  width:100%;padding:14px 16px;border-radius:17px;border:1px solid var(--line);
+  outline:none;color:#fff;background:rgba(0,0,0,.18);margin-bottom:15px;
+}
+.search::placeholder{color:#90a6bf}
+
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.card{padding:19px;border-radius:23px;transition:.25s;cursor:pointer}
+.card:hover{transform:translateY(-4px);background:rgba(255,255,255,.12)}
+.icon{
+  width:48px;height:48px;border-radius:15px;display:grid;place-items:center;
+  background:rgba(44,151,255,.14);border:1px solid rgba(100,190,255,.2);
+  font-size:23px;margin-bottom:14px
+}
+.card h3{margin-bottom:7px}
+.card p{color:var(--muted);font-size:14px;line-height:1.6}
+.tag{
+  display:inline-block;margin-top:12px;padding:5px 9px;border-radius:999px;
+  background:rgba(255,255,255,.07);font-size:11px;color:#bfe8ff
+}
+
+.material{
+  display:none;padding:22px;border-radius:24px;margin-top:16px;
+}
+.material.active{display:block;animation:fade .25s ease}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.material h3{font-size:23px;margin-bottom:10px}
+.material h4{margin:20px 0 8px;color:#a8ddff}
+.material p,.material li{color:#d1dceb;line-height:1.75;font-size:14px}
+.material ul,.material ol{padding-left:20px}
+.note{
+  margin-top:15px;padding:14px 16px;border-radius:16px;
+  background:rgba(80,180,255,.08);border:1px solid rgba(100,190,255,.17);
+  color:#cceeff;font-size:13px;line-height:1.6
+}
+.warning{
+  background:rgba(255,107,122,.08);border-color:rgba(255,107,122,.22);
+  color:#ffd4d9
+}
+
+.quiz{padding:22px;border-radius:24px}
+.question{padding:18px;border-radius:18px;background:rgba(255,255,255,.05);margin-bottom:13px}
+.question p{font-weight:700;line-height:1.5;margin-bottom:10px}
+.option{
+  width:100%;text-align:left;margin:6px 0;padding:11px 12px;border-radius:13px;
+  border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05);color:#fff;
+}
+.option.correct{border-color:#49d88a;background:rgba(73,216,138,.12)}
+.option.wrong{border-color:#ff6b7a;background:rgba(255,107,122,.1)}
+.result{margin-top:14px;font-weight:800;color:#a8ddff}
+
+.footer{
+  margin:45px 0 25px;padding:22px;border-radius:23px;text-align:center;color:var(--muted);
+  font-size:13px;line-height:1.7
+}
+
+.top{position:fixed;right:18px;bottom:18px;width:45px;height:45px;border-radius:50%;border:1px solid var(--line);color:#fff;background:rgba(10,30,55,.7);z-index:40}
+
+@media(max-width:850px){
+  .cards{grid-template-columns:repeat(2,1fr)}
+  .stats{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:560px){
+  .nav{top:7px}
+  .navlinks{display:none}
+  .hero{padding:28px 19px}
+  .cards{grid-template-columns:1fr}
+  .stats{grid-template-columns:repeat(2,1fr)}
+  .section{margin:28px 0}
+}
+</style>
+</head>
+
+<body>
+
+<nav class="nav glass">
+  <a class="brand" href="#home">
+    <div class="logo">✚</div>
+    <div>PMR <span style="color:#83d5ff">MADYA</span></div>
+  </a>
+  <div class="navlinks">
+    <button onclick="go('home')">Home</button>
+    <button onclick="go('materi')">Materi</button>
+    <button onclick="go('kuis')">Kuis</button>
+    <button onclick="go('tentang')">Tentang</button>
+  </div>
+</nav>
+
+<main>
+
+<section id="home" class="hero glass">
+  <span class="badge">🔵 PEMBELAJARAN PMR • SMP/MTs</span>
+  <h1>Belajar <span class="gradient">PMR Madya</span><br>lebih mudah.</h1>
+  <p>
+    Website belajar sederhana untuk mengenal kepalangmerahan, PMR,
+    pertolongan pertama, kesehatan remaja, kesiapsiagaan bencana,
+    dan latihan soal.
+  </p>
+  <div class="hero-actions">
+    <button class="primary" onclick="go('materi')">📚 Mulai Belajar</button>
+    <button class="secondary" onclick="go('kuis')">🧠 Coba Kuis</button>
+  </div>
+</section>
+
+<section class="stats">
+  <div class="stat glass"><b>07</b><span>Topik utama</span></div>
+  <div class="stat glass"><b>PMR</b><span>Tingkat Madya</span></div>
+  <div class="stat glass"><b>∞</b><span>Latihan belajar</span></div>
+  <div class="stat glass"><b>100%</b><span>Responsif HP</span></div>
+</section>
+
+<section id="materi" class="section">
+  <div class="section-head">
+    <div>
+      <h2>📚 Materi Pembelajaran</h2>
+      <p>Pilih materi yang ingin dipelajari.</p>
+    </div>
+  </div>
+
+  <input id="search" class="search" placeholder="🔎 Cari materi..." oninput="filterCards()">
+
+  <div class="cards" id="cards">
+
+    <article class="card glass" data-key="pmi pmr madya kepalangmerahan">
+      <div class="icon">🏥</div>
+      <h3>PMI & PMR</h3>
+      <p>Mengenal PMI, PMR, serta tingkatan PMR.</p>
+      <span class="tag">Dasar</span>
+    </article>
+
+    <article class="card glass" data-key="prinsip dasar kepalangmerahan kemanusiaan">
+      <div class="icon">❤️</div>
+      <h3>Prinsip Dasar</h3>
+      <p>Mengenal prinsip dasar Gerakan Palang Merah dan Bulan Sabit Merah.</p>
+      <span class="tag">Kepalangmerahan</span>
+    </article>
+
+    <article class="card glass" data-key="pertolongan pertama pp penilaian korban">
+      <div class="icon">🩹</div>
+      <h3>Pertolongan Pertama</h3>
+      <p>Konsep keselamatan, penilaian awal, dan bantuan dasar.</p>
+      <span class="tag">Keterampilan</span>
+    </article>
+
+    <article class="card glass" data-key="kesehatan remaja hidup sehat">
+      <div class="icon">🫶</div>
+      <h3>Kesehatan Remaja</h3>
+      <p>Kebiasaan sehat, kebersihan diri, dan menjaga lingkungan.</p>
+      <span class="tag">Kesehatan</span>
+    </article>
+
+    <article class="card glass" data-key="kesiapsiagaan bencana evakuasi">
+      <div class="icon">🌊</div>
+      <h3>Kesiapsiagaan Bencana</h3>
+      <p>Mengenal risiko, kesiapan, komunikasi, dan evakuasi yang aman.</p>
+      <span class="tag">Kesiapsiagaan</span>
+    </article>
+
+    <article class="card glass" data-key="relawan kemanusiaan kepedulian">
+      <div class="icon">🤝</div>
+      <h3>Jiwa Kemanusiaan</h3>
+      <p>Kerja sama, kepedulian, sukarela, dan membantu sesama.</p>
+      <span class="tag">Karakter</span>
+    </article>
+
+    <article class="card glass" data-key="kuis latihan soal">
+      <div class="icon">🧠</div>
+      <h3>Latihan Kuis</h3>
+      <p>Uji pemahaman kamu setelah belajar materi.</p>
+      <span class="tag">Latihan</span>
+    </article>
+
+  </div>
+
+  <!-- MATERI LENGKAP -->
+
+  <div class="material glass" id="m1">
+    <h3>🏥 1. Mengenal PMI & PMR</h3>
+    <p>
+      Palang Merah Remaja (PMR) merupakan wadah kegiatan remaja di sekolah
+      atau lembaga pendidikan dalam kegiatan kepalangmerahan melalui program
+      ekstrakurikuler. PMI membagi PMR menjadi Mula, Madya, dan Wira.
+    </p>
+    <h4>PMR Madya</h4>
+    <p>
+      PMR Madya ditujukan untuk tingkat yang setara dengan SMP.
+      Kegiatan PMR dapat menjadi sarana belajar keterampilan kemanusiaan,
+      kepedulian, kerja sama, dan kesiapsiagaan.
+    </p>
+    <div class="note">💡 Ingat: Mula = setara SD • Madya = setara SMP • Wira = setara SMA.</div>
+  </div>
+
+  <div class="material glass" id="m2">
+    <h3>❤️ 2. Prinsip Dasar Kepalangmerahan</h3>
+    <p>
+      Gerakan Palang Merah dan Bulan Sabit Merah Internasional memiliki
+      tujuh Prinsip Dasar: Kemanusiaan, Kesamaan, Kenetralan, Kemandirian,
+      Kesukarelaan, Kesatuan, dan Kesemestaan.
+    </p>
+    <h4>Contoh penerapan</h4>
+    <ul>
+      <li><b>Kemanusiaan:</b> berusaha meringankan penderitaan manusia.</li>
+      <li><b>Kesamaan:</b> memberikan perhatian tanpa diskriminasi.</li>
+      <li><b>Kenetralan:</b> tidak memihak dalam pertentangan.</li>
+      <li><b>Kesukarelaan:</b> membantu dengan semangat sukarela.</li>
+      <li><b>Kesatuan:</b> satu organisasi Palang Merah dalam satu negara.</li>
+      <li><b>Kesemestaan:</b> gerakan memiliki cakupan dan tanggung jawab universal.</li>
+    </ul>
+  </div>
+
+  <div class="material glass" id="m3">
+    <h3>🩹 3. Pertolongan Pertama</h3>
+    <p>
+      Pertolongan pertama adalah bantuan awal yang diberikan kepada orang
+      yang mengalami masalah kesehatan atau cedera sebelum mendapatkan
+      pertolongan lebih lanjut.
+    </p>
+    <h4>Prioritas utama</h4>
+    <ol>
+      <li>Pastikan lokasi aman bagi penolong, korban, dan orang sekitar.</li>
+      <li>Tenangkan diri dan korban bila memungkinkan.</li>
+      <li>Periksa kondisi secara sederhana dan minta bantuan orang dewasa/layanan darurat bila diperlukan.</li>
+      <li>Berikan bantuan sesuai kemampuan dan pelatihan yang dimiliki.</li>
+      <li>Jangan melakukan tindakan yang belum pernah dipelajari atau dilatih.</li>
+    </ol>
+    <div class="note warning">
+      ⚠️ Materi ini untuk pembelajaran. Dalam keadaan darurat nyata,
+      utamakan keselamatan dan segera minta bantuan orang dewasa,
+      guru/pembina, petugas kesehatan, atau layanan darurat setempat.
+    </div>
+  </div>
+
+  <div class="material glass" id="m4">
+    <h3>🫶 4. Kesehatan Remaja</h3>
+    <h4>Kebiasaan dasar</h4>
+    <ul>
+      <li>Menjaga kebersihan tubuh dan tangan.</li>
+      <li>Makan beragam makanan dan cukup minum.</li>
+      <li>Tidur cukup dan menjaga aktivitas fisik yang wajar.</li>
+      <li>Menjaga kebersihan lingkungan.</li>
+      <li>Berani mencari bantuan orang dewasa tepercaya ketika mengalami masalah.</li>
+    </ul>
+    <h4>Tujuan</h4>
+    <p>
+      Kesehatan remaja bukan hanya tentang fisik, tetapi juga kebiasaan,
+      keselamatan, hubungan sosial yang sehat, dan kemampuan menjaga diri.
+    </p>
+  </div>
+
+  <div class="material glass" id="m5">
+    <h3>🌊 5. Kesiapsiagaan Bencana</h3>
+    <p>
+      Kesiapsiagaan membantu kita mengetahui apa yang harus dilakukan sebelum,
+      saat, dan setelah keadaan darurat.
+    </p>
+    <h4>Yang bisa dipelajari</h4>
+    <ul>
+      <li>Kenali potensi bahaya di sekolah dan rumah.</li>
+      <li>Ketahui jalur evakuasi dan titik kumpul.</li>
+      <li>Simpan nomor kontak penting bersama orang tua/guru.</li>
+      <li>Ikuti instruksi petugas dan jangan menyebarkan informasi yang belum jelas.</li>
+      <li>Latihan evakuasi dilakukan sesuai arahan sekolah dan pembina.</li>
+    </ul>
+  </div>
+
+  <div class="material glass" id="m6">
+    <h3>🤝 6. Jiwa Kemanusiaan</h3>
+    <p>
+      PMR tidak hanya belajar keterampilan, tetapi juga membangun kepedulian,
+      kerja sama, disiplin, tanggung jawab, dan semangat membantu sesama.
+    </p>
+    <h4>Contoh di sekolah</h4>
+    <ul>
+      <li>Membantu menjaga kebersihan lingkungan.</li>
+      <li>Bekerja sama dalam kegiatan sosial sekolah.</li>
+      <li>Mendengarkan teman yang membutuhkan dukungan dan mengajak orang dewasa tepercaya bila diperlukan.</li>
+      <li>Menjaga sikap saling menghormati.</li>
+    </ul>
+  </div>
+
+  <div class="material glass" id="m7">
+    <h3>🧠 7. Ringkasan Cepat</h3>
+    <ul>
+      <li>PMR Madya = tingkat setara SMP.</li>
+      <li>Tujuh prinsip dasar kepalangmerahan perlu dipahami dan diterapkan.</li>
+      <li>Keselamatan penolong adalah bagian penting sebelum membantu.</li>
+      <li>Dalam keadaan serius, segera cari bantuan orang dewasa/petugas yang kompeten.</li>
+      <li>Kesiapsiagaan berarti mengetahui risiko, rencana, jalur evakuasi, dan cara meminta bantuan.</li>
+    </ul>
+  </div>
+</section>
+
+<section id="kuis" class="section">
+  <div class="section-head">
+    <div>
+      <h2>🧠 Kuis PMR</h2>
+      <p>Jawab lalu lihat nilai kamu.</p>
+    </div>
+  </div>
+
+  <div class="quiz glass">
+
+    <div class="question">
+      <p>1. PMR Madya ditujukan untuk tingkat...</p>
+      <button class="option" onclick="answer(this,true)">A. Setara SMP</button>
+      <button class="option" onclick="answer(this,false)">B. Setara SD</button>
+      <button class="option" onclick="answer(this,false)">C. Setara SMA</button>
+    </div>
+
+    <div class="question">
+      <p>2. Berapa jumlah Prinsip Dasar Gerakan Palang Merah dan Bulan Sabit Merah?</p>
+      <button class="option" onclick="answer(this,false)">A. 5</button>
+      <button class="option" onclick="answer(this,true)">B. 7</button>
+      <button class="option" onclick="answer(this,false)">C. 9</button>
+    </div>
+
+    <div class="question">
+      <p>3. Sebelum memberikan bantuan, hal yang perlu diperhatikan adalah...</p>
+      <button class="option" onclick="answer(this,true)">A. Keselamatan lokasi</button>
+      <button class="option" onclick="answer(this,false)">B. Langsung melakukan tindakan apa pun</button>
+      <button class="option" onclick="answer(this,false)">C. Mengabaikan keadaan sekitar</button>
+    </div>
+
+    <div class="question">
+      <p>4. Salah satu contoh kesiapsiagaan bencana adalah...</p>
+      <button class="option" onclick="answer(this,false)">A. Mengabaikan jalur evakuasi</button>
+      <button class="option" onclick="answer(this,true)">B. Mengetahui titik kumpul</button>
+      <button class="option" onclick="answer(this,false)">C. Menyebarkan kabar yang belum jelas</button>
+    </div>
+
+    <div class="question">
+      <p>5. Sikap yang sesuai dengan jiwa kemanusiaan adalah...</p>
+      <button class="option" onclick="answer(this,false)">A. Membeda-bedakan orang</button>
+      <button class="option" onclick="answer(this,true)">B. Peduli dan bekerja sama</button>
+      <button class="option" onclick="answer(this,false)">C. Menolak membantu tanpa alasan</button>
+    </div>
+
+    <div class="result" id="result">Skor: 0 / 5</div>
+    <button class="primary" onclick="resetQuiz()" style="margin-top:15px">🔄 Ulangi Kuis</button>
+  </div>
+</section>
+
+<section id="tentang" class="section">
+  <div class="glass footer">
+    <h2 style="color:#fff;margin-bottom:8px">🔵 Tentang Website</h2>
+    <p>
+      Website ini dibuat sebagai media belajar PMR Madya untuk pelajar.
+      Materi dapat dikembangkan lagi sesuai buku/modul yang digunakan
+      sekolah dan arahan pembina PMR.
+    </p>
+    <br>
+    <p>
+      Sumber rujukan umum: Palang Merah Indonesia (PMI).
+      Untuk materi resmi dan pembelajaran yang lebih lengkap,
+      gunakan arahan PMI dan pembina di sekolah.
+    </p>
+  </div>
+</section>
+
+</main>
+
+<button class="top" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+<script>
+const cardMap = {
+  "PMI & PMR":"m1",
+  "Prinsip Dasar":"m2",
+  "Pertolongan Pertama":"m3",
+  "Kesehatan Remaja":"m4",
+  "Kesiapsiagaan Bencana":"m5",
+  "Jiwa Kemanusiaan":"m6",
+  "Latihan Kuis":"kuis"
+};
+
+document.querySelectorAll(".card").forEach(card=>{
+  card.addEventListener("click",()=>{
+    const title=card.querySelector("h3").textContent;
+    const id=cardMap[title];
+    document.querySelectorAll(".material").forEach(x=>x.classList.remove("active"));
+    if(id && id!=="kuis"){
+      document.getElementById(id).classList.add("active");
+      document.getElementById(id).scrollIntoView({behavior:"smooth",block:"center"});
+    }else{
+      go("kuis");
+    }
+  });
+});
+
+function go(id){
+  document.getElementById(id).scrollIntoView({behavior:"smooth",block:"start"});
+}
+
+function filterCards(){
+  const q=document.getElementById("search").value.toLowerCase().trim();
+  document.querySelectorAll(".card").forEach(card=>{
+    card.style.display=card.dataset.key.includes(q) ? "" : "none";
+  });
+}
+
+let score=0;
+const answered=new Set();
+
+function answer(btn,correct){
+  const question=btn.closest(".question");
+  if(answered.has(question)) return;
+  answered.add(question);
+
+  question.querySelectorAll(".option").forEach(x=>x.disabled=true);
+
+  if(correct){
+    btn.classList.add("correct");
+    score++;
+  }else{
+    btn.classList.add("wrong");
+  }
+  document.getElementById("result").textContent=`Skor: ${score} / 5`;
+}
+
+function resetQuiz(){
+  score=0;
+  answered.clear();
+  document.querySelectorAll(".option").forEach(x=>{
+    x.disabled=false;
+    x.classList.remove("correct","wrong");
+  });
+  document.getElementById("result").textContent="Skor: 0 / 5";
+}
+</script>
+
+</body>
+</html>
