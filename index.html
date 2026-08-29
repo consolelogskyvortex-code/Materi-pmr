@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+<title>Kelabang Putih</title>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: #000;
+    touch-action: none;
+}
+
+canvas {
+    display: block;
+    width: 100vw;
+    height: 100vh;
+    background: #000;
+}
+</style>
+</head>
+
+<body>
+
+<canvas id="canvas"></canvas>
+
+<script>
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+
+let W, H, DPR;
+
+function resize() {
+    DPR = Math.min(window.devicePixelRatio || 1, 2);
+
+    W = window.innerWidth;
+    H = window.innerHeight;
+
+    canvas.width = W * DPR;
+    canvas.height = H * DPR;
+
+    canvas.style.width = W + "px";
+    canvas.style.height = H + "px";
+
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+}
+
+window.addEventListener("resize", resize);
+resize();
+
+
+// ===============================
+// KELABANG
+// ===============================
+
+const segments = [];
+
+const SEGMENT_COUNT = 28;
+const SPACING = 17;
+
+let head = {
+    x: W / 2,
+    y: H / 2,
+    angle: 0
+};
+
+for (let i = 0; i < SEGMENT_COUNT; i++) {
+    segments.push({
+        x: head.x - i * SPACING,
+        y: head.y,
+        angle: 0,
+        phase: i * 0.45
+    });
+}
+
+
+// ===============================
+// KONTROL ARAH
+// ===============================
+
+let targetX = W / 2;
+let targetY = H / 2;
+
+let moving = false;
+
+function setTarget(x, y) {
+    targetX = x;
+    targetY = y;
+    moving = true;
+}
+
+
+// TOUCH
+canvas.addEventListener("touchstart", function(e) {
+    const t = e.touches[0];
+
+    setTarget(t.clientX, t.clientY);
+
+}, { passive: false });
+
+
+canvas.addEventListener("touchmove", function(e) {
+    e.preventDefault();
+
+    const t = e.touches[0];
+
+    setTarget(t.clientX, t.clientY);
+
+}, { passive: false });
+
+
+canvas.addEventListener("touchend", function() {
+    moving = false;
+});
+
+
+// MOUSE
+canvas.addEventListener("mousedown", function(e) {
+    setTarget(e.clientX, e.clientY);
+});
+
+canvas.addEventListener("mousemove", function(e) {
+    if (e.buttons) {
+        setTarget(e.clientX, e.clientY);
+    }
+});
+
+canvas.addEventListener("mouseup", function() {
+    moving = false;
+});
+
+
+// ===============================
+// UTILITAS
+// ===============================
+
+function distance(x1, y1, x2, y2) {
+    return Math.hypot(x2 - x1, y2 - y1);
+}
+
+
+function angleTo(x1, y1, x2, y2) {
+    return Math.atan2(y2 - y1, x2 - x1);
+}
+
+
+function lerpAngle(a, b, amount) {
+    let diff = b - a;
+
+    while (diff > Math.PI) diff -= Math.PI * 2;
+    while (diff < -Math.PI) diff += Math.PI * 2;
+
+    return a + diff * amount;
+}
+
+
+// ===============================
+// UPDATE
+// ===============================
+
+let time = 0;
+
+function update() {
+
+    time += 0.05;
+
+    // Kepala bergerak menuju target
+    if (moving) {
+
+        const dx = targetX - head.x;
+        const dy = targetY - head.y;
+
+        const dist = Math.hypot(dx, dy);
+
+        if (dist > 3) {
+
+            const desiredAngle = Math.atan2(dy, dx);
+
+            head.angle = lerpAngle(
+                head.angle,
+                desiredAngle,
+                0.12
+            );
+
+            const speed = Math.min(3.8, dist * 0.025);
+
+            head.x += Math.cos(head.angle) * speed;
+            head.y += Math.sin(head.angle) * speed;
+        }
+    }
+
+    // Batas layar
+    const margin = 40;
+
+    if (head.x < margin) {
+        head.x = margin;
+        head.angle = lerpAngle(head.angle, 0, 0.08);
+    }
+
+    if (head.x > W - margin) {
+        head.x = W - margin;
+        head.angle = lerpAngle(head.angle, Math.PI, 0.08);
+    }
+
+    if (head.y < margin) {
+        head.y = margin;
+        head.angle = lerpAngle(head.angle, Math.PI / 2, 0.08);
+    }
+
+    if (head.y > H - margin) {
+        head.y = H - margin;
+        head.angle = lerpAngle(head.angle, -Math.PI / 2, 0.08);
+    }
+
+
+    // Segmen mengikuti bagian sebelumnya
+    segments[0].x = head.x;
+    segments[0].y = head.y;
+    segments[0].angle = head.angle;
+
+    for (let i = 1; i < segments.length; i++) {
+
+        const current = segments[i];
+        const previous = segments[i - 1];
+
+        const dx = previous.x - current.x;
+        const dy = previous.y - current.y;
+
+        const dist = Math.hypot(dx, dy);
+
+        if (dist > SPACING) {
+
+            const a = Math.atan2(dy, dx);
+
+            const move = dist - SPACING;
+
+            current.x += Math.cos(a) * move;
+            current.y += Math.sin(a) * move;
+
+            current.angle = lerpAngle(
+                current.angle,
+                a,
+                0.25
+            );
+        }
+    }
+}
+
+
+// ===============================
+// GAMBAR
+// ===============================
+
+function drawBackground() {
+
+    ctx.fillStyle = "#000";
+    ctx.fillRect(0, 0, W, H);
+}
+
+
+function drawLeg(x, y, angle, side, length, phase) {
+
+    const wave =
+        Math.sin(time * 5 + phase) * 0.22;
+
+    const sideAngle =
+        angle + side * (Math.PI / 2 + wave);
+
+    const baseX =
+        x + Math.cos(angle) * 2;
+
+    const baseY =
+        y + Math.sin(angle) * 2;
+
+    const bendAngle =
+        sideAngle + side * 0.25;
+
+    const midX =
+        baseX +
+        Math.cos(bendAngle) * length * 0.45;
+
+    const midY =
+        baseY +
+        Math.sin(bendAngle) * length * 0.45;
+
+    const endX =
+        midX +
+        Math.cos(sideAngle) * length * 0.55;
+
+    const endY =
+        midY +
+        Math.sin(sideAngle) * length * 0.55;
+
+
+    ctx.beginPath();
+
+    ctx.moveTo(baseX, baseY);
+    ctx.lineTo(midX, midY);
+    ctx.lineTo(endX, endY);
+
+    ctx.strokeStyle = "#fff";
+    ctx.lineWidth = 1.5;
+    ctx.lineCap = "round";
+    ctx.stroke();
+}
+
+
+function drawSegment(segment, index) {
+
+    const x = segment.x;
+    const y = segment.y;
+
+    // ukuran tubuh
+    const size =
+        index === 0
+        ? 9
+        : Math.max(5, 8 - index * 0.08);
+
+
+    // Kaki
+    if (index > 1) {
+
+        const legLength =
+            12 + Math.sin(index * 0.4) * 2;
+
+        drawLeg(
+            x,
+            y,
+            segment.angle,
+            -1,
+            legLength,
+            segment.phase
+        );
+
+        drawLeg(
+            x,
+            y,
+            segment.angle,
+            1,
+            legLength,
+            segment.phase
+        );
+    }
+
+
+    // Badan
+    ctx.beginPath();
+
+    ctx.arc(
+        x,
+        y,
+        size,
+        0,
+        Math.PI * 2
+    );
+
+    ctx.fillStyle = "#fff";
+    ctx.fill();
+
+
+    // garis pemisah tubuh
+    if (index > 0) {
+
+        ctx.beginPath();
+
+        ctx.moveTo(
+            x - Math.cos(segment.angle) * size * 0.7,
+            y - Math.sin(segment.angle) * size * 0.7
+        );
+
+        ctx.lineTo(
+            x + Math.cos(segment.angle) * size * 0.7,
+            y + Math.sin(segment.angle) * size * 0.7
+        );
+
+        ctx.strokeStyle = "#000";
+        ctx.lineWidth = 1;
+
+        ctx.stroke();
+    }
+}
+
+
+function drawHead() {
+
+    const x = head.x;
+    const y = head.y;
+    const a = head.angle;
+
+
+    // kepala
+    ctx.save();
+
+    ctx.translate(x, y);
+    ctx.rotate(a);
+
+
+    ctx.beginPath();
+
+    ctx.ellipse(
+        0,
+        0,
+        13,
+        10,
+        0,
+        0,
+        Math.PI * 2
+    );
+
+    ctx.fillStyle = "#fff";
+    ctx.fill();
+
+
+    // mata
+    ctx.fillStyle = "#000";
+
+    ctx.beginPath();
+    ctx.arc(7, -4, 2, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.beginPath();
+    ctx.arc(7, 4, 2, 0, Math.PI * 2);
+    ctx.fill();
+
+
+    // antena
+    ctx.strokeStyle = "#fff";
+    ctx.lineWidth = 1.5;
+
+    ctx.beginPath();
+    ctx.moveTo(8, -5);
+    ctx.lineTo(20, -12);
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.moveTo(8, 5);
+    ctx.lineTo(20, 12);
+    ctx.stroke();
+
+    ctx.restore();
+}
+
+
+function drawTarget() {
+
+    if (!moving) return;
+
+    const pulse =
+        Math.sin(time * 5) * 2;
+
+    ctx.beginPath();
+
+    ctx.arc(
+        targetX,
+        targetY,
+        8 + pulse,
+        0,
+        Math.PI * 2
+    );
+
+    ctx.strokeStyle =
+        "rgba(255,255,255,0.35)";
+
+    ctx.lineWidth = 1;
+
+    ctx.stroke();
+}
+
+
+// ===============================
+// LOOP
+// ===============================
+
+function loop() {
+
+    drawBackground();
+
+    update();
+
+    // gambar dari belakang ke depan
+    for (let i = segments.length - 1; i >= 1; i--) {
+        drawSegment(segments[i], i);
+    }
+
+    drawHead();
+
+    drawTarget();
+
+    requestAnimationFrame(loop);
+}
+
+loop();
+
+</script>
+
+</body>
+</html>
